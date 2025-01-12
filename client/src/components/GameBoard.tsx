@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSocket } from '../context/SocketContext';
-import { BOARD_SIZE, CellState } from '../types/game';
+import { BOARD_SIZE, CellState, ShipType, ShotResult } from '../types/game';
+import SinkNotification from './SinkNotification';
 
 const GameBoard = () => {
   const { isConnected, startNewGame, makeShot, gameState, error } = useSocket();
+  const [sunkShip, setSunkShip] = useState<ShipType | null>(null);
 
   useEffect(() => {
     if (isConnected) {
@@ -24,7 +26,11 @@ const GameBoard = () => {
     }
 
     console.log('Attempting shot at:', { x, y });
-    makeShot({ x, y });
+    makeShot({ x, y }, (result: ShotResult) => {
+      if (result.shipSunk) {
+        setSunkShip(result.shipSunk);
+      }
+    });
   };
 
   const getCellClassName = (state: CellState) => {
@@ -38,6 +44,13 @@ const GameBoard = () => {
         return baseClass;
     }
   };
+
+  // Subscribe to shot results to handle ship sinking
+  useEffect(() => {
+    return () => {
+      setSunkShip(null);
+    };
+  }, []);
 
   if (!isConnected) {
     return (
@@ -63,7 +76,13 @@ const GameBoard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Game Status */}
+      {sunkShip && (
+        <SinkNotification
+          shipType={sunkShip}
+          onClose={() => setSunkShip(null)}
+        />
+      )}
+
       <div className="flex items-center justify-between">
         <div className="text-lg font-medium">
           {gameState?.isGameOver ? (

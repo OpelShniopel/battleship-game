@@ -12,7 +12,10 @@ import { GameEvent, GameState, Coordinates, ShotResult } from '../types/game';
 interface SocketContextType {
   isConnected: boolean;
   startNewGame: () => void;
-  makeShot: (coordinates: Coordinates) => void;
+  makeShot: (
+    coordinates: Coordinates,
+    callback?: (result: ShotResult) => void
+  ) => void;
   gameState: GameState | null;
   error: string | null;
 }
@@ -46,7 +49,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsConnected(false);
       console.log('Disconnected from server:', reason);
       if (reason === 'io server disconnect') {
-        // Server initiated disconnect, don't attempt to reconnect
         newSocket.close();
       }
     });
@@ -122,10 +124,18 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [socket]);
 
   const makeShot = useCallback(
-    (coordinates: Coordinates) => {
+    (coordinates: Coordinates, callback?: (result: ShotResult) => void) => {
       if (socket && gameState && !gameState.isGameOver) {
         console.log('Sending shot:', coordinates);
         socket.emit(GameEvent.SHOT, coordinates);
+
+        if (callback) {
+          const handleShotResult = (result: ShotResult) => {
+            callback(result);
+            socket.off(GameEvent.SHOT, handleShotResult);
+          };
+          socket.on(GameEvent.SHOT, handleShotResult);
+        }
       } else {
         console.log('Shot not sent:', {
           socket: !!socket,
