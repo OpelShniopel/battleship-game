@@ -1,6 +1,12 @@
 import { Server, Socket } from 'socket.io';
 import { GameBoardManager } from '../game/GameBoardManager';
-import { Coordinates, GameEvent } from '../types/game';
+import {
+  Coordinates,
+  GameEvent,
+  CellState,
+  Orientation,
+  SHIP_CONFIGS,
+} from '../types/game';
 
 export function setupGameHandlers(
   io: Server, // For the future if I think for something interesting
@@ -57,9 +63,26 @@ export function setupGameHandlers(
 
       if (result.gameOver) {
         const finalState = game.getGameState();
+        // When game is over, send the complete board with all ships revealed
+        const completeBoard = finalState.board.map((row) => [...row]);
+
+        // Reveal all remaining ships
+        finalState.ships.forEach((ship) => {
+          const size = SHIP_CONFIGS[ship.type].size;
+          for (let i = 0; i < size; i++) {
+            const x =
+              ship.orientation === Orientation.HORIZONTAL ? ship.x + i : ship.x;
+            const y =
+              ship.orientation === Orientation.VERTICAL ? ship.y + i : ship.y;
+            if (completeBoard[y][x] === CellState.EMPTY) {
+              completeBoard[y][x] = CellState.SHIP;
+            }
+          }
+        });
+
         socket.emit(GameEvent.GAME_OVER, {
           hasWon: finalState.hasWon,
-          board: game.getClientBoard(),
+          board: completeBoard,
         });
         cleanupGame(socket.id);
       }

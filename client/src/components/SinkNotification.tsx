@@ -25,11 +25,11 @@ const SinkNotification = ({
   }, [onClose]);
 
   return (
-    <div className="animate-fade-in fixed right-4 top-4 z-50">
+    <div className="fixed right-4 top-4 z-50 animate-fade-in">
       <div className="rounded-lg bg-green-600 px-6 py-4 shadow-lg">
         <div className="flex items-center space-x-2">
           <span className="text-lg text-white">
-            💥 You sunk a {getShipDisplayName(shipType)}!
+            ☠️ You sunk a {getShipDisplayName(shipType)}!
           </span>
         </div>
       </div>

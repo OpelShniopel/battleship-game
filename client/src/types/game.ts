@@ -1,17 +1,17 @@
 export enum CellState {
   EMPTY = 'EMPTY',
+  SHIP = 'SHIP',
   HIT = 'HIT',
   MISS = 'MISS',
 }
 
-export enum ShipType {
-  CARRIER = 'CARRIER',
-  BATTLESHIP = 'BATTLESHIP',
-  CRUISER = 'CRUISER',
-  SUBMARINE = 'SUBMARINE',
-  DESTROYER = 'DESTROYER',
-  PATROL = 'PATROL',
-}
+export type ShipType =
+  | 'CARRIER'
+  | 'BATTLESHIP'
+  | 'CRUISER'
+  | 'SUBMARINE'
+  | 'DESTROYER'
+  | 'PATROL';
 
 export interface Coordinates {
   x: number;

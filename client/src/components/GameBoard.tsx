@@ -40,8 +40,23 @@ const GameBoard = () => {
         return `${baseClass} hit-cell`;
       case CellState.MISS:
         return `${baseClass} miss-cell`;
+      case CellState.SHIP:
+        return `${baseClass} ship-cell`;
       default:
         return baseClass;
+    }
+  };
+
+  const getCellContent = (state: CellState) => {
+    switch (state) {
+      case CellState.HIT:
+        return '💥';
+      case CellState.MISS:
+        return '•';
+      case CellState.SHIP:
+        return gameState?.isGameOver ? '🚢' : '';
+      default:
+        return '';
     }
   };
 
@@ -115,8 +130,7 @@ const GameBoard = () => {
                   className={getCellClassName(cellState)}
                   onClick={() => handleCellClick(col, row)}
                 >
-                  {cellState === CellState.HIT && '💥'}
-                  {cellState === CellState.MISS && '•'}
+                  {getCellContent(cellState)}
                 </div>
               );
             })}
