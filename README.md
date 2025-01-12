@@ -9,7 +9,7 @@
 1. Clone the repository:
 ```bash
 git clone https://github.com/OpelShniopel/battleship-game.git
-cd opelshniopel-battleship-game
+cd battleship-game
 ```
 
 2. Install dependencies for both client and server:
