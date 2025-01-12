@@ -1,28 +1,9 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { GameEvent, GameState, Coordinates, ShotResult } from '../types/game';
+import { SocketContext, SocketContextProviderProps } from './useSocket';
 
-interface SocketContextType {
-  isConnected: boolean;
-  startNewGame: () => void;
-  makeShot: (
-    coordinates: Coordinates,
-    callback?: (result: ShotResult) => void
-  ) => void;
-  gameState: GameState | null;
-  error: string | null;
-}
-
-const SocketContext = createContext<SocketContextType | undefined>(undefined);
-
-export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
+export const SocketProvider: React.FC<SocketContextProviderProps> = ({
   children,
 }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -160,12 +141,4 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
   );
-};
-
-export const useSocket = () => {
-  const context = useContext(SocketContext);
-  if (context === undefined) {
-    throw new Error('useSocket must be used within a SocketProvider');
-  }
-  return context;
 };

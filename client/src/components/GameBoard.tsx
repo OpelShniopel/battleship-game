@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSocket } from '../context/SocketContext';
+import { useSocket } from '../context/useSocket';
 import { BOARD_SIZE, CellState, ShipType, ShotResult } from '../types/game';
 import SinkNotification from './SinkNotification';
 
@@ -45,7 +45,6 @@ const GameBoard = () => {
     }
   };
 
-  // Subscribe to shot results to handle ship sinking
   useEffect(() => {
     return () => {
       setSunkShip(null);
