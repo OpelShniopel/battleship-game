@@ -20,30 +20,47 @@ const io = new Server(httpServer, {
 });
 
 const activeGames = new Map();
-const connectedClients = new Set<string>();
 
-httpServer.on('error', (error) => {
-  console.error('Server error:', error);
-});
+// Track client connections with timestamps
+const clientConnections = new Map<
+  string,
+  {
+    timestamp: number;
+    ip: string;
+  }
+>();
 
-// Rate limiting configuration
-const connectionThrottle = new Map<string, number>();
-const THROTTLE_WINDOW = 60000; // 1 minute
-const MAX_CONNECTIONS_PER_WINDOW = 10;
+setInterval(() => {
+  const now = Date.now();
+  for (const [socketId, data] of clientConnections.entries()) {
+    // Removes connection data if it's older than 1 hour
+    if (now - data.timestamp > 3600000) {
+      clientConnections.delete(socketId);
+    }
+  }
+}, 300000); // Clean up every 5 minutes
 
 io.use((socket, next) => {
   const clientIp = socket.handshake.address;
   const now = Date.now();
-  const lastConnection = connectionThrottle.get(clientIp) ?? 0;
 
-  if (now - lastConnection > THROTTLE_WINDOW) {
-    connectionThrottle.set(clientIp, now);
-    return next();
+  // Count active connections from this IP
+  let activeConnectionsFromIp = 0;
+  for (const data of clientConnections.values()) {
+    if (data.ip === clientIp) {
+      activeConnectionsFromIp++;
+    }
   }
 
-  if (connectedClients.size >= MAX_CONNECTIONS_PER_WINDOW) {
-    return next(new Error('Too many connections'));
+  // Only 10 connections allowed from the same IP
+  if (activeConnectionsFromIp >= 10) {
+    return next(new Error('Too many connections from this IP'));
   }
+
+  clientConnections.set(socket.id, {
+    timestamp: now,
+    ip: clientIp,
+  });
 
   next();
 });
@@ -51,8 +68,6 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
   try {
     console.log(`Client connected: ${socket.id}`);
-    connectedClients.add(socket.id);
-    console.log(`Active connections: ${connectedClients.size}`);
 
     socket.on('error', (error) => {
       console.error(`Socket ${socket.id} error:`, error);
@@ -62,9 +77,8 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', (reason) => {
       console.log(`Client disconnected: ${socket.id}, reason: ${reason}`);
-      connectedClients.delete(socket.id);
+      clientConnections.delete(socket.id);
       activeGames.delete(socket.id);
-      console.log(`Remaining connections: ${connectedClients.size}`);
     });
   } catch (error) {
     console.error('Error in connection handler:', error);
