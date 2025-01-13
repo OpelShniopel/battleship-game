@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSocket } from '../context/useSocket';
-import {
-  BOARD_SIZE,
-  CellState,
-  ShipType,
-  Coordinates,
-  ShotResult,
-} from '../types/game';
+import { BOARD_SIZE, CellState, ShipType, ShotResult } from '../types/game';
 import {
   Waves,
   Ship,
@@ -16,19 +10,11 @@ import {
   Crosshair,
 } from 'lucide-react';
 import SinkNotification from './SinkNotification';
-
-interface ShotStatsProps {
-  remainingShots: number;
-}
-
-interface GameStatusBannerProps {
-  isGameOver: boolean;
-  hasWon: boolean;
-}
-
-interface LastShot extends Coordinates {
-  timestamp: number;
-}
+import {
+  GameStatusBannerProps,
+  LastShot,
+  ShotStatsProps,
+} from '../types/gameboard';
 
 // Shot statistics component
 const ShotStats: React.FC<ShotStatsProps> = ({ remainingShots }) => (
