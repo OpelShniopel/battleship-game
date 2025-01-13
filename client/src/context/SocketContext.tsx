@@ -3,6 +3,17 @@ import { io, Socket } from 'socket.io-client';
 import { GameEvent, GameState, Coordinates, ShotResult } from '../types/game';
 import { SocketContext, SocketContextProviderProps } from './useSocket';
 
+// Get the server URL based on the current environment
+const getServerUrl = () => {
+  // If we're connecting from localhost, use localhost
+  if (window.location.hostname === 'localhost') {
+    return 'http://localhost:6969';
+  }
+
+  // Otherwise, connect to the server using the same IP as the client
+  return `http://${window.location.hostname}:6969`;
+};
+
 export const SocketProvider: React.FC<SocketContextProviderProps> = ({
   children,
 }) => {
@@ -12,7 +23,7 @@ export const SocketProvider: React.FC<SocketContextProviderProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:6969', {
+    const newSocket = io(getServerUrl(), {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,

@@ -9,7 +9,10 @@ const httpServer = createServer(app);
 // Socket.IO configuration
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: [
+      'http://localhost:5173',
+      /^http:\/\/192\.168\.1\.\d+:5173$/, // Matches any IP in 192.168.1.x network
+    ],
     methods: ['GET', 'POST'],
   },
   pingTimeout: 60000,
