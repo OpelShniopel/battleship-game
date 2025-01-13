@@ -21,7 +21,17 @@ function App() {
           </main>
 
           <footer className="mt-8 text-center text-sm text-gray-500">
-            <p>© 2025 Battleship Game • Created by Dovydas :)</p>
+            <p>
+              © 2025 Battleship Game •{' '}
+              <span className="group relative">
+                Created by{' '}
+                <span className="animate-pulse font-bold text-blue-400 transition-all duration-300 hover:text-blue-300 group-hover:animate-none">
+                  Dovydas
+                </span>
+                <span className="absolute -inset-1 -z-10 block animate-pulse blur-sm filter group-hover:animate-none group-hover:bg-blue-400/25" />
+              </span>{' '}
+              ;)
+            </p>
           </footer>
         </div>
       </div>
