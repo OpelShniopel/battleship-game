@@ -1,37 +1,59 @@
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShipType } from '../types/game';
 
-const getShipDisplayName = (shipType: ShipType): string => {
-  // Converting SNAKE_CASE to Title Case
-  return shipType
-    .split('_')
-    .map((word) => word.charAt(0) + word.toLowerCase().slice(1))
-    .join(' ');
-};
+interface ShipNotificationProps {
+  shipType: ShipType | null;
+  onClose: () => void;
+}
 
-const SinkNotification = ({
+const SinkNotification: React.FC<ShipNotificationProps> = ({
   shipType,
   onClose,
-}: {
-  shipType: ShipType;
-  onClose: () => void;
 }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 3000); // Close notification after 3 seconds
+  const [isVisible, setIsVisible] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
 
-    return () => clearTimeout(timer);
-  }, [onClose]);
+  useEffect(() => {
+    let fadeInTimeout: NodeJS.Timeout;
+    let fadeOutTimeout: NodeJS.Timeout;
+    let cleanupTimeout: NodeJS.Timeout;
+
+    if (shipType) {
+      setShouldRender(true);
+      // Start fade in
+      fadeInTimeout = setTimeout(() => setIsVisible(true), 50);
+
+      // Start fade out
+      fadeOutTimeout = setTimeout(() => {
+        setIsVisible(false);
+      }, 2700);
+
+      // Final cleanup
+      cleanupTimeout = setTimeout(() => {
+        setShouldRender(false);
+        onClose();
+      }, 3000); // Full duration including fade out
+    }
+
+    return () => {
+      clearTimeout(fadeInTimeout);
+      clearTimeout(fadeOutTimeout);
+      clearTimeout(cleanupTimeout);
+    };
+  }, [shipType, onClose]);
+
+  if (!shouldRender || !shipType) return null;
 
   return (
-    <div className="fixed right-4 top-4 z-50 animate-fade-in">
-      <div className="rounded-lg bg-green-600 px-6 py-4 shadow-lg">
-        <div className="flex items-center space-x-2">
-          <span className="text-lg text-white">
-            ☠️ You sunk a {getShipDisplayName(shipType)}!
-          </span>
-        </div>
+    <div
+      className={`pointer-events-none fixed right-4 top-4 z-50 ${
+        isVisible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'
+      } transition-all duration-300`}
+    >
+      <div className="rounded-lg bg-green-900/50 p-4">
+        <p className="text-lg font-bold text-white">
+          🎯 You sunk the {shipType.toLowerCase()}!
+        </p>
       </div>
     </div>
   );
