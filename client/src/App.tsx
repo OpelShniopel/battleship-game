@@ -1,4 +1,4 @@
-import GameBoard from './components/GameBoard';
+import GameBoard from './components/game/GameBoard.tsx';
 import { SocketProvider } from './context/SocketContext';
 import { Swords } from 'lucide-react';
 

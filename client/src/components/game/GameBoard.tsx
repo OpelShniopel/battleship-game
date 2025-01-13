@@ -1,62 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useSocket } from '../context/useSocket';
-import { BOARD_SIZE, CellState, ShipType, ShotResult } from '../types/game';
-import {
-  Waves,
-  Ship,
-  Target,
-  AlertTriangle,
-  Award,
-  Crosshair,
-} from 'lucide-react';
-import SinkNotification from './SinkNotification';
-import {
-  GameStatusBannerProps,
-  LastShot,
-  ShotStatsProps,
-} from '../types/gameboard';
+import { useSocket } from '../../context/useSocket.ts';
+import { BOARD_SIZE, CellState, ShipType } from '../../types/game.ts';
+import { Waves, Ship, Target, AlertTriangle } from 'lucide-react';
+import { GameStatusBanner } from './GameStatusBanner.tsx';
+import { ShotStats } from './ShotStats.tsx';
+import SinkNotification from '../SinkNotification.tsx';
+import type { LastShot } from '../../types/gameboard.ts';
 
-// Shot statistics component
-const ShotStats: React.FC<ShotStatsProps> = ({ remainingShots }) => (
-  <div className="mb-6 flex items-center justify-between rounded-lg bg-gray-800 p-4">
-    <div className="flex items-center space-x-3">
-      <Crosshair className="h-6 w-6 text-blue-400" />
-      <div>
-        <p className="text-sm font-medium text-gray-400">Shots Remaining</p>
-        <p className="text-2xl font-bold text-white">{remainingShots}</p>
-      </div>
-    </div>
-  </div>
-);
-
-// Game status banner component
-const GameStatusBanner: React.FC<GameStatusBannerProps> = ({
-  isGameOver,
-  hasWon,
-}) => {
-  if (!isGameOver) return null;
-
-  return (
-    <div
-      className={`mb-6 flex items-center justify-between rounded-lg p-4 ${
-        hasWon ? 'bg-green-900/50' : 'bg-red-900/50'
-      }`}
-    >
-      <div className="flex items-center space-x-3">
-        {hasWon ? (
-          <Award className="h-6 w-6 text-green-400" />
-        ) : (
-          <AlertTriangle className="h-6 w-6 text-red-400" />
-        )}
-        <p className="text-lg font-bold text-white">
-          {hasWon ? 'Victory!' : 'Game Over'}
-        </p>
-      </div>
-    </div>
-  );
-};
-
-// Game board component
 const GameBoard: React.FC = () => {
   const { isConnected, startNewGame, makeShot, gameState, error } = useSocket();
   const [sunkShip, setSunkShip] = useState<ShipType | null>(null);
@@ -75,7 +25,7 @@ const GameBoard: React.FC = () => {
     if (cellState === CellState.HIT || cellState === CellState.MISS) return;
 
     setLastShot({ x, y, timestamp: Date.now() });
-    makeShot({ x, y }, (result: ShotResult) => {
+    makeShot({ x, y }, (result) => {
       if (result.shipSunk) {
         setSunkShip(result.shipSunk);
         setTimeout(() => setSunkShip(null), 3000);
@@ -159,7 +109,6 @@ const GameBoard: React.FC = () => {
   return (
     <div className="space-y-6">
       <SinkNotification shipType={sunkShip} onClose={() => setSunkShip(null)} />
-
       <div className="space-y-6">
         <GameStatusBanner
           isGameOver={gameState?.isGameOver ?? false}
