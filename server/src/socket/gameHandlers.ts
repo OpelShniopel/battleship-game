@@ -1,4 +1,4 @@
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import { GameBoardManager } from '../game/GameBoardManager';
 import {
   Coordinates,
@@ -9,7 +9,6 @@ import {
 } from '../types/game';
 
 export function setupGameHandlers(
-  io: Server, // For the future if I think for something interesting
   socket: Socket,
   activeGames: Map<string, GameBoardManager>
 ) {
@@ -63,7 +62,7 @@ export function setupGameHandlers(
 
       if (result.gameOver) {
         const finalState = game.getGameState();
-        // When game is over, send the complete board with all ships revealed
+        // When the game is over, send the complete board with all ships revealed
         const completeBoard = finalState.board.map((row) => [...row]);
 
         // Reveal all remaining ships

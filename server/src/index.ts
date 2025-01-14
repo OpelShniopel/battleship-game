@@ -76,7 +76,7 @@ io.on('connection', (socket) => {
       console.error(`Socket ${socket.id} error:`, error);
     });
 
-    setupGameHandlers(io, socket, activeGames);
+    setupGameHandlers(socket, activeGames);
 
     socket.on('disconnect', (reason) => {
       console.log(`Client disconnected: ${socket.id}, reason: ${reason}`);
