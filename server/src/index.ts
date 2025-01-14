@@ -70,7 +70,9 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
   try {
+    const totalConnections = clientConnections.size;
     console.log(`Client connected: ${socket.id}`);
+    console.log(`Total active connections: ${totalConnections}`);
 
     socket.on('error', (error) => {
       console.error(`Socket ${socket.id} error:`, error);
@@ -82,6 +84,8 @@ io.on('connection', (socket) => {
       console.log(`Client disconnected: ${socket.id}, reason: ${reason}`);
       clientConnections.delete(socket.id);
       activeGames.delete(socket.id);
+      const remainingConnections = clientConnections.size;
+      console.log(`Remaining active connections: ${remainingConnections}`);
     });
   } catch (error) {
     console.error('Error in connection handler:', error);

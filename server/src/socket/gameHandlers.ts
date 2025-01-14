@@ -90,8 +90,4 @@ export function setupGameHandlers(
       socket.emit('error', 'Invalid shot');
     }
   });
-
-  socket.on('disconnect', () => {
-    cleanupGame(socket.id);
-  });
 }
