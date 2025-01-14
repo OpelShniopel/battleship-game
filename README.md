@@ -2,7 +2,7 @@
 
 ### Prerequisites
 - Node.js
-- npm or yarn package manager
+- yarn or npm package manager
 
 ### Installation and Setup
 
@@ -39,6 +39,22 @@ yarn dev  # or: npm run dev
 ```
 The client will start on port 5173. Open http://localhost:5173 in your browser to play the game.
 
+### Running Tests
+
+1. Client Tests:
+```bash
+cd client
+yarn test           # Run tests in watch mode
+yarn test:coverage  # Run tests with coverage report
+```
+
+2. Server Tests:
+```bash
+cd server
+yarn test           # Run tests in watch mode
+yarn test:coverage  # Run tests with coverage report
+```
+
 ### Connection Limits
 For security purposes, the server allows a maximum of 10 concurrent connections from the same IP address. This helps prevent server overload and ensures fair access for all players.
 
@@ -46,12 +62,12 @@ For security purposes, the server allows a maximum of 10 concurrent connections 
 - You have 25 shots to find and sink all ships
 - Successful hits don't count against your remaining shots
 - The game ends when either:
-    - All ships are sunk (Victory!)
-    - You run out of shots (Game Over)
+  - All ships are sunk (Victory!)
+  - You run out of shots (Game Over)
 - Ship sizes:
-    - Carrier (5 cells) x1
-    - Battleship (4 cells) x1
-    - Cruiser (3 cells) x1
-    - Submarine (3 cells) x1
-    - Destroyer (2 cells) x3
-    - Patrol Boat (1 cell) x3
+  - Carrier (5 cells) x1
+  - Battleship (4 cells) x1
+  - Cruiser (3 cells) x1
+  - Submarine (3 cells) x1
+  - Destroyer (2 cells) x3
+  - Patrol Boat (1 cell) x3
