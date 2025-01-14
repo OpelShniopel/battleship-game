@@ -80,7 +80,6 @@ export const SocketProvider: React.FC<SocketContextProviderProps> = ({
     };
 
     newSocket.on(GameEvent.SHOT, (result: ShotResult) => {
-      console.log('Shot result received:', result);
       setGameState((prevState) => updateGameStateAfterShot(prevState, result));
     });
 
@@ -118,7 +117,6 @@ export const SocketProvider: React.FC<SocketContextProviderProps> = ({
   const makeShot = useCallback(
     (coordinates: Coordinates, callback?: (result: ShotResult) => void) => {
       if (socket && gameState && !gameState.isGameOver) {
-        console.log('Sending shot:', coordinates);
         socket.emit(GameEvent.SHOT, coordinates);
 
         if (callback) {
