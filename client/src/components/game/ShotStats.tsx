@@ -1,9 +1,6 @@
 import { Crosshair } from 'lucide-react';
 import React from 'react';
-
-interface ShotStatsProps {
-  remainingShots: number;
-}
+import { ShotStatsProps } from '../../types/gameboard.ts';
 
 export const ShotStats: React.FC<ShotStatsProps> = ({ remainingShots }) => (
   <div className="mb-6 flex items-center justify-between rounded-lg bg-gray-800 p-4">

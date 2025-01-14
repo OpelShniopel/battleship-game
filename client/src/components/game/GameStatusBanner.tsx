@@ -1,10 +1,6 @@
 import { Award, AlertTriangle } from 'lucide-react';
 import React from 'react';
-
-interface GameStatusBannerProps {
-  isGameOver: boolean;
-  hasWon: boolean;
-}
+import { GameStatusBannerProps } from '../../types/gameboard.ts';
 
 export const GameStatusBanner: React.FC<GameStatusBannerProps> = ({
   isGameOver,

@@ -81,13 +81,13 @@ describe('GameBoardManager', () => {
 
   test('processes miss correctly', () => {
     const state = gameBoardManager.getGameState();
-    let emptyCoord = findEmptyCoordinate(state.board);
+    let emptyCoordinate = findEmptyCoordinate(state.board);
 
-    if (!emptyCoord) {
+    if (!emptyCoordinate) {
       throw new Error('No empty cell found on board');
     }
 
-    const result = gameBoardManager.processShot(emptyCoord);
+    const result = gameBoardManager.processShot(emptyCoordinate);
     expect(result.cellState).toBe(CellState.MISS);
     expect(result.remainingShots).toBe(24); // Shots decrease on misses
   });
