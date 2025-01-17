@@ -107,8 +107,14 @@ const GameBoard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <SinkNotification shipType={sunkShip} onClose={() => setSunkShip(null)} />
+    <div className="relative">
+      <div className="absolute inset-x-0 top-0 z-50">
+        <SinkNotification
+          shipType={sunkShip}
+          onClose={() => setSunkShip(null)}
+        />
+      </div>
+
       <div className="space-y-6">
         <GameStatusBanner
           isGameOver={gameState?.isGameOver ?? false}
