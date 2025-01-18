@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest';
-import { GameBoardManager } from '../GameBoardManager';
-import { CellState } from '../../types/game';
+import { GameBoardManager } from '../GameBoardManager.js';
+import { CellState } from '../../types/game.js';
 
 describe('GameBoardManager', () => {
   let gameBoardManager: GameBoardManager;

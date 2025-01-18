@@ -10,7 +10,7 @@ import {
   ShipPosition,
   ShipType,
   ShotResult,
-} from '../types/game';
+} from '../types/game.js';
 
 export class GameBoardManager {
   private readonly state: GameState;

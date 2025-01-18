@@ -1,12 +1,12 @@
 import { Socket } from 'socket.io';
-import { GameBoardManager } from '../game/GameBoardManager';
+import { GameBoardManager } from '../game/GameBoardManager.js';
 import {
   Coordinates,
   GameEvent,
   CellState,
   Orientation,
   SHIP_CONFIGS,
-} from '../types/game';
+} from '../types/game.js';
 
 export function setupGameHandlers(
   socket: Socket,
