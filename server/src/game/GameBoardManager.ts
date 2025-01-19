@@ -12,6 +12,11 @@ import {
   ShotResult,
 } from '../types/game.js';
 
+interface PlacementResult {
+  success: boolean;
+  ships: ShipPosition[];
+}
+
 /**
  * Manages the game board state and game logic for a Battleship game.
  * Key responsibilities:
@@ -48,32 +53,87 @@ export class GameBoardManager {
   }
 
   /**
-   * Places ships on the board following these rules:
+   * Places ships on the board with a retry mechanism:
+   * - Attempts to place all ships up to MAX_RESET_ATTEMPTS times
+   * - If placement fails, clears the board and tries again
+   * - Throws error if all attempts fail
+   *
+   * Rules for ship placement:
    * - Ships cannot overlap
    * - Ships must maintain 1 cell distance from each other (including diagonally)
    * - Ships must be placed entirely within board boundaries
    * - Ships are placed in random valid positions
+   *
+   * @throws Error if unable to place ships after MAX_RESET_ATTEMPTS
    */
   private placeAllShips(board: Board): ShipPosition[] {
+    const MAX_RESET_ATTEMPTS = 3;
+
+    for (let attempt = 0; attempt < MAX_RESET_ATTEMPTS; attempt++) {
+      const result = this.tryPlacingAllShips(board);
+      if (result.success) {
+        return result.ships;
+      }
+      this.clearBoard(board);
+    }
+
+    throw new Error(
+      'Failed to place ships after multiple board reset attempts'
+    );
+  }
+
+  private tryPlacingAllShips(board: Board): PlacementResult {
     const ships: ShipPosition[] = [];
 
-    Object.entries(SHIP_CONFIGS).forEach(([type, config]) => {
-      const shipType = type as ShipType;
-      // Place multiple ships of the same type
-      for (let i = 0; i < config.count; i++) {
-        let placed = false;
-        while (!placed) {
-          const position = this.generateRandomPosition(shipType);
-          if (this.canPlaceShip(board, position)) {
-            this.placeShip(board, position);
-            ships.push({ ...position, hits: 0 });
-            placed = true;
-          }
-        }
-      }
-    });
+    try {
+      this.placeShipsForAllTypes(board, ships);
+      return { success: true, ships };
+    } catch (error) {
+      return { success: false, ships: [] };
+    }
+  }
 
-    return ships;
+  private placeShipsForAllTypes(board: Board, ships: ShipPosition[]): void {
+    for (const [type, config] of Object.entries(SHIP_CONFIGS)) {
+      const shipType = type as ShipType;
+      this.placeShipsOfType(board, ships, shipType, config.count);
+    }
+  }
+
+  private placeShipsOfType(
+    board: Board,
+    ships: ShipPosition[],
+    shipType: ShipType,
+    count: number
+  ): void {
+    for (let i = 0; i < count; i++) {
+      const position = this.findValidPosition(board, shipType);
+      this.placeShip(board, position);
+      ships.push({ ...position, hits: 0 });
+    }
+  }
+
+  private findValidPosition(board: Board, shipType: ShipType): ShipPosition {
+    const MAX_ATTEMPTS = 100;
+
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const position = this.generateRandomPosition(shipType);
+      if (this.canPlaceShip(board, position)) {
+        return position;
+      }
+    }
+
+    throw new Error(
+      `Failed to place ${shipType} after ${MAX_ATTEMPTS} attempts`
+    );
+  }
+
+  private clearBoard(board: Board): void {
+    for (let y = 0; y < BOARD_SIZE; y++) {
+      for (let x = 0; x < BOARD_SIZE; x++) {
+        board[y][x] = CellState.EMPTY;
+      }
+    }
   }
 
   private generateRandomPosition(type: ShipType): ShipPosition {
