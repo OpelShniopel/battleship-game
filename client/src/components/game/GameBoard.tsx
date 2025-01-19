@@ -18,6 +18,7 @@ const GameBoard: React.FC = () => {
   const { isConnected, startNewGame, makeShot, gameState, error } = useSocket();
   const [sunkShip, setSunkShip] = useState<ShipType | null>(null);
   const [lastShot, setLastShot] = useState<LastShot | null>(null);
+  const [hasFirstShot, setHasFirstShot] = useState(false);
 
   useEffect(() => {
     if (isConnected) {
@@ -38,12 +39,18 @@ const GameBoard: React.FC = () => {
     if (cellState === CellState.HIT || cellState === CellState.MISS) return;
 
     setLastShot({ x, y, timestamp: Date.now() });
+    setHasFirstShot(true);
     makeShot({ x, y }, (result) => {
       if (result.shipSunk) {
         setSunkShip(result.shipSunk);
         setTimeout(() => setSunkShip(null), 3000);
       }
     });
+  };
+
+  const handleNewGame = () => {
+    startNewGame();
+    setHasFirstShot(false);
   };
 
   /**
@@ -121,7 +128,7 @@ const GameBoard: React.FC = () => {
           <AlertTriangle className="mx-auto mb-4 h-8 w-8 text-red-400" />
           <p className="mb-4 text-red-400">{error}</p>
           <button
-            onClick={startNewGame}
+            onClick={handleNewGame}
             className="rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
           >
             Try Again
@@ -149,8 +156,13 @@ const GameBoard: React.FC = () => {
         <div className="flex items-center justify-between">
           <ShotStats remainingShots={gameState?.remainingShots ?? 25} />
           <button
-            onClick={startNewGame}
-            className="rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
+            onClick={handleNewGame}
+            disabled={!hasFirstShot && !gameState?.isGameOver}
+            className={`rounded px-4 py-2 text-white transition-colors ${
+              hasFirstShot || gameState?.isGameOver
+                ? 'bg-blue-500 hover:bg-blue-600'
+                : 'cursor-not-allowed bg-blue-500/50'
+            }`}
           >
             New Game
           </button>
