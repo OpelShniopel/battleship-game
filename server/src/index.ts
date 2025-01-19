@@ -3,6 +3,13 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { setupGameHandlers } from './socket/gameHandlers.js';
 
+/**
+ * Socket.IO server setup with security measures:
+ * 1. Rate limiting: Maximum 10 connections per IP
+ * 2. Connection tracking: Stores connection timestamps and IPs
+ * 3. Auto cleanup: Removes old connection data after 1 hour
+ * 4. Error handling: Graceful handling of socket errors
+ */
 const app = express();
 const httpServer = createServer(app);
 
@@ -24,7 +31,6 @@ const io = new Server(httpServer, {
 
 const activeGames = new Map();
 
-// Track client connections with timestamps
 const clientConnections = new Map<
   string,
   {
@@ -33,6 +39,7 @@ const clientConnections = new Map<
   }
 >();
 
+// Clean up old connections every 5 minutes
 setInterval(() => {
   const now = Date.now();
   for (const [socketId, data] of clientConnections.entries()) {
@@ -41,8 +48,9 @@ setInterval(() => {
       clientConnections.delete(socketId);
     }
   }
-}, 300000); // Clean up every 5 minutes
+}, 300000);
 
+// Connection middleware for rate limiting
 io.use((socket, next) => {
   const clientIp = socket.handshake.address;
   const now = Date.now();

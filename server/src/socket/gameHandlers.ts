@@ -8,6 +8,17 @@ import {
   SHIP_CONFIGS,
 } from '../types/game.js';
 
+/**
+ * Handles game-related socket events:
+ * 1. NEW_GAME: Creates new game instance and sends initial state
+ * 2. SHOT: Processes player shots and sends results
+ * 3. Game Over: Reveals full board and cleans up game instance
+ *
+ * Key features:
+ * - Automatic cleanup of abandoned games
+ * - Error handling for invalid shots and game states
+ * - Final board reveal showing all ship positions
+ */
 export function setupGameHandlers(
   socket: Socket,
   activeGames: Map<string, GameBoardManager>
@@ -62,10 +73,10 @@ export function setupGameHandlers(
 
       if (result.gameOver) {
         const finalState = game.getGameState();
-        // When the game is over, send the complete board with all ships revealed
+        // Show all ships on game over
         const completeBoard = finalState.board.map((row) => [...row]);
 
-        // Reveal all remaining ships
+        // Reveal ships that weren't hit
         finalState.ships.forEach((ship) => {
           const size = SHIP_CONFIGS[ship.type].size;
           for (let i = 0; i < size; i++) {

@@ -6,6 +6,18 @@ interface ShipNotificationProps {
   onClose: () => void;
 }
 
+/**
+ * Notification component for sunk ships with:
+ * - Fade in/out animations
+ * - Auto-dismissal
+ * - Cleanup timers
+ *
+ * Uses multiple timeouts for smooth animation:
+ * 1. Fade in delay
+ * 2. Display duration
+ * 3. Fade out
+ * 4. Component cleanup
+ */
 const SinkNotification: React.FC<ShipNotificationProps> = ({
   shipType,
   onClose,

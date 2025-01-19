@@ -14,6 +14,18 @@ const getServerUrl = () => {
   return `http://${window.location.hostname}:6969`;
 };
 
+/**
+ * Socket.IO context provider that manages:
+ * 1. Server connection and reconnection logic
+ * 2. Game state management
+ * 3. Real-time communication for game events
+ *
+ * Features:
+ * - Automatic reconnection with exponential backoff
+ * - Dynamic server URL based on environment
+ * - Comprehensive error handling
+ * - Game state synchronization
+ */
 export const SocketProvider: React.FC<SocketContextProviderProps> = ({
   children,
 }) => {
@@ -23,6 +35,7 @@ export const SocketProvider: React.FC<SocketContextProviderProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Initialize socket with reconnection settings
     const newSocket = io(getServerUrl(), {
       reconnection: true,
       reconnectionAttempts: 5,
@@ -31,12 +44,14 @@ export const SocketProvider: React.FC<SocketContextProviderProps> = ({
       timeout: 20000,
     });
 
+    // Socket event handlers for connection management
     newSocket.on('connect', () => {
       setIsConnected(true);
       setError(null);
       console.log('Connected to server');
     });
 
+    // Handle various error scenarios
     newSocket.on('disconnect', (reason) => {
       setIsConnected(false);
       console.log('Disconnected from server:', reason);
@@ -60,6 +75,12 @@ export const SocketProvider: React.FC<SocketContextProviderProps> = ({
       setError(null);
     });
 
+    /**
+     * Updates game state after each shot
+     * - Creates new board state
+     * - Updates shot count
+     * - Handles game over conditions
+     */
     const updateGameStateAfterShot = (
       prevState: GameState | null,
       result: ShotResult

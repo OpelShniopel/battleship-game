@@ -12,6 +12,13 @@ import {
   ShotResult,
 } from '../types/game.js';
 
+/**
+ * Manages the game board state and game logic for a Battleship game.
+ * Key responsibilities:
+ * - Board initialization and ship placement
+ * - Shot processing and hit detection
+ * - Game state management
+ */
 export class GameBoardManager {
   private readonly state: GameState;
 
@@ -40,12 +47,19 @@ export class GameBoardManager {
       .map(() => Array(BOARD_SIZE).fill(CellState.EMPTY));
   }
 
+  /**
+   * Places ships on the board following these rules:
+   * - Ships cannot overlap
+   * - Ships must maintain 1 cell distance from each other (including diagonally)
+   * - Ships must be placed entirely within board boundaries
+   * - Ships are placed in random valid positions
+   */
   private placeAllShips(board: Board): ShipPosition[] {
     const ships: ShipPosition[] = [];
 
     Object.entries(SHIP_CONFIGS).forEach(([type, config]) => {
       const shipType = type as ShipType;
-      // Place the specified number of ships for each type
+      // Place multiple ships of the same type
       for (let i = 0; i < config.count; i++) {
         let placed = false;
         while (!placed) {
@@ -96,6 +110,12 @@ export class GameBoardManager {
     );
   }
 
+  /**
+   * Checks if a ship can be placed at the given position by:
+   * 1. Verifying the ship stays within board boundaries
+   * 2. Ensuring no overlap with existing ships
+   * 3. Maintaining minimum spacing between ships (1 cell buffer)
+   */
   private canPlaceShip(board: Board, position: ShipPosition): boolean {
     const { x, y, orientation, type } = position;
     const size = SHIP_CONFIGS[type].size;
@@ -104,6 +124,8 @@ export class GameBoardManager {
       return false;
     }
 
+    // Check a 3x(size+2) or (size+2)x3 area around the ship
+    // This ensures ships don't touch even diagonally
     for (let i = -1; i <= size; i++) {
       for (let j = -1; j <= 1; j++) {
         const checkX = orientation === Orientation.HORIZONTAL ? x + i : x + j;
@@ -137,9 +159,17 @@ export class GameBoardManager {
     }
   }
 
+  /**
+   * Processes a shot at given coordinates:
+   * 1. Validates the shot (within bounds, game not over, cell not previously shot)
+   * 2. Updates the board state (HIT or MISS)
+   * 3. Updates ship hit counts and checks for sunk ships
+   * 4. Updates remaining shots and checks game over conditions
+   */
   public processShot(coordinates: Coordinates): ShotResult {
     const { x, y } = coordinates;
 
+    // Validate shot
     if (
       x < 0 ||
       x >= BOARD_SIZE ||
@@ -156,10 +186,12 @@ export class GameBoardManager {
     let cellState: CellState;
     let shipSunk: ShipType | undefined;
 
+    // Process hit or miss
     if (this.state.board[y][x] === CellState.SHIP) {
       cellState = CellState.HIT;
       this.state.board[y][x] = CellState.HIT;
 
+      // Update ship hits and check if sunk
       const hitShip = this.updateShipHits(coordinates);
       if (hitShip && this.isShipSunk(hitShip)) {
         shipSunk = hitShip.type;
@@ -170,7 +202,6 @@ export class GameBoardManager {
       this.state.remainingShots--;
     }
 
-    // Check game over conditions
     this.checkGameOver();
 
     return {

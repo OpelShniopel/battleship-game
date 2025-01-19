@@ -7,6 +7,13 @@ import { ShotStats } from './ShotStats.tsx';
 import SinkNotification from '../SinkNotification.tsx';
 import type { LastShot } from '../../types/gameboard.ts';
 
+/**
+ * Main game board component that handles:
+ * 1. Game grid rendering and interaction
+ * 2. Shot processing and feedback
+ * 3. Game state visualization
+ * 4. Ship sinking notifications
+ */
 const GameBoard: React.FC = () => {
   const { isConnected, startNewGame, makeShot, gameState, error } = useSocket();
   const [sunkShip, setSunkShip] = useState<ShipType | null>(null);
@@ -18,6 +25,12 @@ const GameBoard: React.FC = () => {
     }
   }, [isConnected, startNewGame]);
 
+  /**
+   * Handles cell clicks with the following rules:
+   * - Prevents clicking already hit/miss cells
+   * - Tracks last shot for highlighting
+   * - Processes shot results and ship sinking
+   */
   const handleCellClick = (x: number, y: number) => {
     if (!gameState || gameState.isGameOver) return;
 
@@ -33,6 +46,12 @@ const GameBoard: React.FC = () => {
     });
   };
 
+  /**
+   * Generates cell styling based on:
+   * - Current cell state (hit, miss, ship, empty)
+   * - Last shot highlighting
+   * - Interactive state (hoverable, clickable)
+   */
   const getCellClassName = (state: CellState, x: number, y: number): string => {
     const baseClass =
       'relative w-full aspect-square border border-gray-700 transition-all duration-200 group';
@@ -51,6 +70,12 @@ const GameBoard: React.FC = () => {
     }
   };
 
+  /**
+   * Renders cell content based on state:
+   * - Hit cells show target icon
+   * - Miss cells show waves icon
+   * - Ships only show on game over
+   */
   const getCellContent = (state: CellState) => {
     switch (state) {
       case CellState.HIT:
