@@ -5,8 +5,10 @@ import { SocketContext, SocketContextProviderProps } from './useSocket';
 
 // Get the server URL based on the current environment
 const getServerUrl = () => {
+  const hostname = window.location.hostname;
+
   // If we're connecting from localhost, use localhost
-  if (window.location.hostname === 'localhost') {
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return 'http://localhost:6969';
   }
 

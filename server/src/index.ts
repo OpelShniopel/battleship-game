@@ -18,7 +18,8 @@ const io = new Server(httpServer, {
   cors: {
     origin: [
       'http://localhost:5173',
-      /^http:\/\/192\.168\.1\.\d+:5173$/, // Matches any IP in 192.168.1.x network
+      'http://127.0.0.1:5173',
+      /^http:\/\/192\.168\.1\.\d+:5173$/,  // Matches any IP in 192.168.1.x network
     ],
     methods: ['GET', 'POST'],
   },
