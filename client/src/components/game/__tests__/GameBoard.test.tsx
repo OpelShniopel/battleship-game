@@ -4,7 +4,6 @@ import { vi, describe, test, expect, beforeEach } from 'vitest';
 import GameBoard from '../GameBoard.tsx';
 import { SocketContext } from '../../../context/useSocket.ts';
 import { CellState, GameState } from '../../../types/game.ts';
-import '@testing-library/jest-dom/vitest';
 
 // Mock socket context
 const mockSocket = {
