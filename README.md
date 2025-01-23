@@ -46,6 +46,9 @@ The client will start on port 5173. Open http://localhost:5173 in your browser t
 cd client
 yarn test           # Run tests in watch mode
 yarn test:coverage  # Run tests with coverage report
+# Or using npm:
+npm test           # Run tests in watch mode
+npm run test:coverage  # Run tests with coverage report
 ```
 
 2. Server Tests:
@@ -53,6 +56,9 @@ yarn test:coverage  # Run tests with coverage report
 cd server
 yarn test           # Run tests in watch mode
 yarn test:coverage  # Run tests with coverage report
+# Or using npm:
+npm test           # Run tests in watch mode
+npm run test:coverage  # Run tests with coverage report
 ```
 
 ### Connection Limits
