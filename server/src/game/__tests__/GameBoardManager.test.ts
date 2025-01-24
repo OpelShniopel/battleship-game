@@ -40,31 +40,65 @@ describe('GameBoardManager', () => {
 
   test('ships maintain minimum distance', () => {
     const state = gameBoardManager.getGameState();
-    const board = state.board;
+    validateShipSpacing(state.board);
+  });
 
-    for (let y = 0; y < 10; y++) {
-      for (let x = 0; x < 10; x++) {
+  function validateShipSpacing(board: CellState[][]) {
+    for (let y = 0; y < board.length; y++) {
+      for (let x = 0; x < board[y].length; x++) {
         if (board[y][x] === CellState.SHIP) {
-          // Check surrounding cells (including diagonals)
-          for (let dy = -1; dy <= 1; dy++) {
-            for (let dx = -1; dx <= 1; dx++) {
-              if (dy === 0 && dx === 0) continue;
-
-              const newY = y + dy;
-              const newX = x + dx;
-
-              if (newY >= 0 && newY < 10 && newX >= 0 && newX < 10) {
-                // Ships shouldn't touch diagonally
-                if (dx !== 0 && dy !== 0) {
-                  expect(board[newY][newX]).not.toBe(CellState.SHIP);
-                }
-              }
-            }
-          }
+          validateSurroundingCells(board, x, y);
         }
       }
     }
-  });
+  }
+
+  function validateSurroundingCells(
+    board: CellState[][],
+    x: number,
+    y: number
+  ) {
+    const deltas = getDeltaCoordinates();
+
+    deltas.forEach(({ dx, dy }) => {
+      const newCoord = {
+        x: x + dx,
+        y: y + dy,
+      };
+
+      if (
+        isValidCoordinate(newCoord, board.length) &&
+        isDiagonalDelta(dx, dy)
+      ) {
+        expect(board[newCoord.y][newCoord.x]).not.toBe(CellState.SHIP);
+      }
+    });
+  }
+
+  function getDeltaCoordinates() {
+    const deltas: Array<{ dx: number; dy: number }> = [];
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        if (dy !== 0 || dx !== 0) {
+          deltas.push({ dx, dy });
+        }
+      }
+    }
+    return deltas;
+  }
+
+  function isValidCoordinate(
+    coord: { x: number; y: number },
+    boardSize: number
+  ): boolean {
+    return (
+      coord.x >= 0 && coord.x < boardSize && coord.y >= 0 && coord.y < boardSize
+    );
+  }
+
+  function isDiagonalDelta(dx: number, dy: number): boolean {
+    return dx !== 0 && dy !== 0;
+  }
 
   test('processes hit correctly', () => {
     const state = gameBoardManager.getGameState();
